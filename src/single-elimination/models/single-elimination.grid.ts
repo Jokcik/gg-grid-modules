@@ -1,5 +1,6 @@
 import {EMPTY_PLAYER, Match, Stat} from './match';
 import {Stage} from './stage';
+import * as _ from 'lodash';
 
 export class SingleEliminationGrid {
   public stages: Stage[] = [];
@@ -14,15 +15,8 @@ export class SingleEliminationGrid {
         stage.matches.push(match);
       }
 
-      // if (countStages === i) {
-      //   const thirdMatch = new Match();
-      //   thirdMatch.stat.isThird = true;
-      //   stage.matches.push(thirdMatch);
-      // }
-
       this.stages.push(stage);
     }
-
 
     return this.stages;
   }
@@ -31,11 +25,13 @@ export class SingleEliminationGrid {
     const stage = this.stages[0];
     const matchLength = stage.matches.length;
 
-    if (players.length < matchLength) { throw new Error('Неверное количество участников'); }
+    if (players.length < matchLength) {
+      throw new Error('Неверное количество участников');
+    }
     stage.matches.forEach(match => match.player1 = players.pop());
     const needPlayers = matchLength - players.length;
     players.push(...Array(needPlayers).fill(EMPTY_PLAYER));
-    // players = _.shuffle(players);
+    players = _.shuffle(players);
     stage.matches.forEach(match => match.player2 = players.pop());
 
     return this.stages;
@@ -43,11 +39,19 @@ export class SingleEliminationGrid {
 
   public winEmptyPlayers(stageId: number): Stage[] {
     const stage = this.stages[stageId];
-    const nextStage = this.stages[stageId + 1];
-    if (!nextStage) { throw new Error('Нет следующего stage для перехода'); }
+    let nextStage = this.stages[stageId + 1];
+    if (!nextStage && stageId === 0) {
+      nextStage = stage;
+    }
+    if (!nextStage) {
+      throw new Error('Нет следующего stage для перехода');
+    }
 
     stage.matches.forEach((match, idx) => {
-      if (match.player2 !== EMPTY_PLAYER) { return; }
+      if (match.player2 !== EMPTY_PLAYER) {
+        return;
+      }
+      match.winPlayer1(match.bo);
       nextStage.playerNextStage(idx, match.stat.win);
     });
 
@@ -56,7 +60,12 @@ export class SingleEliminationGrid {
 
   public winPlayerInMatch(stageId: number, matchId: number, playerId: string, score: number) {
     const match = this.stages[stageId].matches[matchId];
-    if (match.player1 !== playerId && match.player2 !== playerId) { return match; }
+    if (!match.player1 || !match.player2) {
+      return match;
+    }
+    if (match.player1 !== playerId && match.player2 !== playerId) {
+      return match;
+    }
 
     let closed: boolean = false;
     const isFirstPlayer = match.player1 === playerId;
@@ -70,7 +79,6 @@ export class SingleEliminationGrid {
       this.stages[stageId + 1].playerNextStage(matchId, match.stat.win);
       const thirdMatch = this.stages[this.stages.length - 1].matches[1];
       if (this.stages.length - 2 === stageId && thirdMatch) {
-
         if (matchId === 0) {
           thirdMatch.player1 = match.stat.loss;
         } else {
@@ -86,20 +94,20 @@ export class SingleEliminationGrid {
     let currentMatchId = matchId;
     const players = [];
     for (let i = stageId; i < this.stages.length; ++i) {
-       const match = this.stages[i].matches[currentMatchId];
+      const match = this.stages[i].matches[currentMatchId];
 
-       match.stat = new Stat();
-       match.closed = false;
-       if (currentMatchId !== matchId) {
-         if (players.includes(match.player1)) {
-           delete match.player1;
-         } else if (players.includes(match.player2)) {
-           delete match.player2;
-         }
-       }
+      match.stat = new Stat();
+      match.closed = false;
+      if (i !== stageId) {
+        if (players.includes(match.player1)) {
+          delete match.player1;
+        } else if (players.includes(match.player2)) {
+          delete match.player2;
+        }
+      }
 
-       players.push(match.player1, match.player2);
-       currentMatchId = Math.floor(currentMatchId / 2);
+      players.push(match.player1 || '', match.player2 || '');
+      currentMatchId = Match.getNextMatchId(currentMatchId);
     }
   }
 
@@ -121,7 +129,7 @@ export class SingleEliminationGrid {
   public static generateGrid(players: string[]) {
     players = players.slice();
 
-    const countStages = Math.ceil(Math.log2(players.length));
+    const countStages = Math.ceil(Math.log2(players.length)) || 1;
     const grid = new SingleEliminationGrid();
     grid.generateStages(countStages);
     // grid.initFirstStage(_.shuffle(players));

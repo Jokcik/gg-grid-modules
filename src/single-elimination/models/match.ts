@@ -22,7 +22,7 @@ export class Match {
   player2: string;
 
   bo: BestOf = BestOf.BO1;
-  closed: boolean;
+  closed: boolean = false;
   isThird: boolean;
 
   stat: Stat = new Stat();
