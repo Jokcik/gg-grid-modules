@@ -10,6 +10,7 @@ export class DoubleDownGrid {
     const grid = new DoubleDownGrid();
     grid.generateStages(countStages);
 
+
     return grid;
   }
 
@@ -19,7 +20,7 @@ export class DoubleDownGrid {
 
     for (let i = doubleSages; i >= 1; --i) {
       const stage = new Stage();
-      const countMatches = Math.floor((i + 1) / 2);
+      const countMatches = Math.pow(2, Math.ceil(i / 2) - 1);
       for (let j = 1; j <= countMatches; ++j) {
         const match = new Match();
         stage.matches.push(match);

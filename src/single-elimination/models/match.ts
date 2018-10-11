@@ -1,11 +1,11 @@
+export const EMPTY_PLAYER = 'empty';
+
 export class Stat {
   score1: number = 0;
   score2: number = 0;
 
   win: string;
   loss: string;
-
-  isThird: boolean = false;
 }
 
 export enum BestOf {
@@ -18,16 +18,17 @@ export enum BestOf {
 }
 
 export class Match {
-  player1: string = null;
-  player2: string = null;
+  player1: string;
+  player2: string;
 
   bo: BestOf = BestOf.BO1;
   closed: boolean;
+  isThird: boolean;
 
   stat: Stat = new Stat();
 
   public winPlayer1(onScore: number) {
-    if (this.closed) { return; }
+    if (this.closed) { return this.closed; }
     this.stat.score1 += onScore;
 
     if (this.stat.score1 >= this.bo) {
@@ -40,7 +41,7 @@ export class Match {
   }
 
   public winPlayer2(onScore: number) {
-    if (this.closed) { return; }
+    if (this.closed) { return this.closed; }
     this.stat.score2 += onScore;
 
     if (this.stat.score2 >= this.bo) {
