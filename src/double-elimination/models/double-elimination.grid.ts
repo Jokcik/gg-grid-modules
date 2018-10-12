@@ -60,7 +60,7 @@ export class DoubleEliminationGrid {
     }
   }
 
-  public winDownGridPlayer(stageId: number, matchId: number, playerId: string, score: number) {
+  public  winDownGridPlayer(stageId: number, matchId: number, playerId: string, score: number) {
     const match = this.downGrid.stages[stageId].matches[matchId];
     if (match.player1 !== playerId && match.player2 !== playerId) { return match; }
 
