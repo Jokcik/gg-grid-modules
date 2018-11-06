@@ -1,11 +1,18 @@
 import {SingleEliminationController} from './single-elimination/single-elimination.controller';
-import {DoubleEliminationController} from './double-elimination/double-elimination.controller';
-import {EMPTY_PLAYER} from './single-elimination/models/match';
+import {EMPTY_PLAYER, Player} from './models/player';
+// import {DoubleEliminationController} from './double-elimination/double-elimination.controller';
+// import {EMPTY_PLAYER} from './single-elimination/models/match';
 
 const single = new SingleEliminationController();
-const double = new DoubleEliminationController();
+// const double = new DoubleEliminationController();
 
-double.generateGrid(['1', '2', '3', '4', '5', '6', '7', EMPTY_PLAYER, '9', '10', '11', '12', '13', '14', '15', '16']);
+const players = Array(4);
+players[0] = new Player('1');
+players[1] = EMPTY_PLAYER;
+players[2] = new Player('2');
+players[3] = new Player('3');
+
+single.generateGrid(players);
 
 
 

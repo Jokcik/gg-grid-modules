@@ -1,12 +1,41 @@
-import {EMPTY_PLAYER, Match, Stat} from './match';
-import {Stage} from './stage';
-import * as _ from 'lodash';
+import {Grid} from '../../interfaces/grid.interface';
+import {Stage} from '../../models/stage';
+import {EMPTY_PLAYER, Player} from '../../models/player';
+import {IPlayer} from '../../interfaces/player.interface';
+import {IGridConfig} from '../../interfaces/grid-config.interface';
+import {Match} from '../../models/match';
+import {shuffle} from 'lodash';
 
-export class SingleEliminationGrid {
-  public stages: Stage[] = [];
+export class SingleEliminationGrid extends Grid {
+  // public addSuperFinal() {
+  //   const stage = new Stage();
+  //   stage.matches.push(new Match());
+  //   this._stages.push(stage);
+  //
+  //   return this;
+  // }
 
-  public generateStages(countStages: number): Stage[] {
-    this.stages = [];
+  constructor(private players: IPlayer[],
+              private config: IGridConfig) {
+    super();
+    const countStages = Math.ceil(Math.log2(this.players.length)) || 1;
+
+    this.generateStages(countStages);
+    if (config.prizePlaces > 2 || true) {
+      this.addThird();
+    }
+
+    this.initFirstStage(this.players);
+    this.winEmptyPlayers(0);
+  }
+
+  private addThird() {
+    const match = new Match();
+    this._stages[this._stages.length - 1].matches.push(match);
+  }
+
+  private generateStages(countStages: number): Stage[] {
+    this._stages = [];
     for (let i = 1; i <= countStages; ++i) {
       const stage = new Stage();
       const countMatches = Math.pow(2, countStages - i);
@@ -15,31 +44,31 @@ export class SingleEliminationGrid {
         stage.matches.push(match);
       }
 
-      this.stages.push(stage);
+      this._stages.push(stage);
     }
 
-    return this.stages;
+    return this._stages;
   }
 
-  public initFirstStage(players: string[]): Stage[] {
-    const stage = this.stages[0];
+  private initFirstStage(players: IPlayer[]): Stage[] {
+    const stage = this._stages[0];
     const matchLength = stage.matches.length;
 
     if (players.length < matchLength) {
       throw new Error('Неверное количество участников');
     }
-    stage.matches.forEach(match => match.player1 = players.pop());
+    stage.matches.forEach(match => match.players[0] = players.pop());
     const needPlayers = matchLength - players.length;
     players.push(...Array(needPlayers).fill(EMPTY_PLAYER));
-    players = _.shuffle(players);
-    stage.matches.forEach(match => match.player2 = players.pop());
+    players = shuffle(players);
+    stage.matches.forEach(match => match.players[1] = players.pop());
 
-    return this.stages;
+    return this._stages;
   }
 
-  public winEmptyPlayers(stageId: number): Stage[] {
-    const stage = this.stages[stageId];
-    let nextStage = this.stages[stageId + 1];
+  private winEmptyPlayers(stageId: number): Stage[] {
+    const stage = this._stages[stageId];
+    let nextStage = this._stages[stageId + 1];
     if (!nextStage && stageId === 0) {
       nextStage = stage;
     }
@@ -48,98 +77,103 @@ export class SingleEliminationGrid {
     }
 
     stage.matches.forEach((match, idx) => {
-      if (match.player2 !== EMPTY_PLAYER) {
-        return;
-      }
-      match.winPlayer1(match.bo);
-      nextStage.playerNextStage(idx, match.stat.win);
+      if (match.players[1] !== EMPTY_PLAYER) { return; }
+      this.setScoreAndMovePlayers(match, match.bo, 0);
     });
 
-    return this.stages;
+    return this._stages;
   }
 
-  public winPlayerInMatch(stageId: number, matchId: number, playerId: string, score: number) {
-    const match = this.stages[stageId].matches[matchId];
-    if (!match.player1 || !match.player2) {
-      return match;
-    }
-    if (match.player1 !== playerId && match.player2 !== playerId) {
-      return match;
+  public findMatchByPlayer(playerId: string): Match {
+    for (const stage of this._stages) {
+      for (const match of stage.matches) {
+        if (match.players && match.players.some(player => player.id === playerId)) {
+          return match;
+        }
+      }
     }
 
-    let closed: boolean = false;
-    const isFirstPlayer = match.player1 === playerId;
-    if (isFirstPlayer) {
-      closed = match.winPlayer1(score);
+    return null;
+  }
+
+  public fromJson<T extends Grid>(grid: object): T {
+    return undefined;
+  }
+
+  public getDiff<T extends Grid>(grid: T): object {
+    return undefined;
+  }
+
+  public getJson(): object {
+    return undefined;
+  }
+
+  public getMatch(matchId: string): Match {
+    for (const stage of this._stages) {
+      for (const match of stage.matches) {
+        if (match._id === matchId) {
+          return match;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public setScoreAndMovePlayers(match: Match, ...scorePlayers: number[]): void {
+    if (scorePlayers.length !== 2) { throw new Error('Неверное количество очков'); }
+
+    match.setScore(scorePlayers[0], scorePlayers[1]);
+    if (!match.closed) { return; }
+
+    const [stageIdx, matchIdx] = this.getStageAndMatchIdx(match);
+
+    const nextMatchIdx = Math.floor(matchIdx / 2);
+    if (matchIdx % 2 === 0) {
+      this._stages[stageIdx + 1].matches[nextMatchIdx].players[0] = match.winner;
     } else {
-      closed = match.winPlayer2(score);
+      this._stages[stageIdx + 1].matches[nextMatchIdx].players[1] = match.winner;
     }
 
-    if (closed && this.stages.length !== stageId + 1) {
-      this.stages[stageId + 1].playerNextStage(matchId, match.stat.win);
-      const thirdMatch = this.stages[this.stages.length - 1].matches[1];
-      if (this.stages.length - 2 === stageId && thirdMatch) {
-        if (matchId === 0) {
-          thirdMatch.player1 = match.stat.loss;
-        } else {
-          thirdMatch.player2 = match.stat.loss;
-        }
+    const thirdMatch = this._stages[this._stages.length - 1].matches[1];
+    if (this._stages.length - 2 === stageIdx && thirdMatch) {
+      if (matchIdx === 0) {
+        thirdMatch.players[0] = match.loser;
+      } else {
+        thirdMatch.players[1] = match.loser;
       }
     }
-
-    return match;
   }
 
-  public cancelResultMatch(stageId: number, matchId: number) {
-    let currentMatchId = matchId;
-    const players = [];
-    for (let i = stageId; i < this.stages.length; ++i) {
-      const match = this.stages[i].matches[currentMatchId];
+  public cancelMatchResultAndRevertMovePlayers(match: Match) {
+    const [stageIdx, matchIdx] = this.getStageAndMatchIdx(match);
 
-      match.stat = new Stat();
-      match.closed = false;
-      if (i !== stageId) {
-        if (players.includes(match.player1)) {
-          delete match.player1;
-        } else if (players.includes(match.player2)) {
-          delete match.player2;
+    let currentMatchId = matchIdx;
+    const players: Player[] = [];
+    for (let i = stageIdx; i < this._stages.length; ++i) {
+      const currentMatch = this._stages[i].matches[currentMatchId];
+
+      if (i !== stageIdx) {
+        if (currentMatch.players[0] && players.find(player => player.id === currentMatch.players[0].id)) {
+          delete currentMatch.players[0];
+        } else if (currentMatch.players[1] && players.find(player => player.id === currentMatch.players[1].id)) {
+          delete currentMatch.players[1];
         }
       }
 
-      players.push(match.player1 || '', match.player2 || '');
-      currentMatchId = Match.getNextMatchId(currentMatchId);
+      players.push(currentMatch.players[0] || new Player(), currentMatch.players[1] || new Player());
+      currentMatchId = Math.floor(matchIdx / 2);
     }
   }
 
-  public addThird(): SingleEliminationGrid {
-    const match = new Match();
-    match.isThird = true;
-    this.stages[this.stages.length - 1].matches.push(match);
-    return this;
+  private getNextMatchIdx(matchIdx: number) {
+    return Math.floor(matchIdx / 2);
   }
 
-  public addSuperFinal() {
-    const stage = new Stage();
-    stage.matches.push(new Match());
-    this.stages.push(stage);
+  private getStageAndMatchIdx(match: Match) {
+    const stageIdx = this._stages.findIndex(stage => !!stage.matches.find(m => m._id === match._id));
+    const matchIdx = this._stages[stageIdx].matches.findIndex(m => m._id === match._id);
 
-    return this;
-  }
-
-  public static generateGrid(players: string[]) {
-    players = players.slice();
-
-    const countStages = Math.ceil(Math.log2(players.length)) || 1;
-    const grid = new SingleEliminationGrid();
-    grid.generateStages(countStages);
-    // grid.initFirstStage(_.shuffle(players));
-    grid.initFirstStage(players);
-    grid.winEmptyPlayers(0);
-
-    // grid.winPlayerInMatch(2, 1, '2', 1);
-
-    // grid.cancelResultMatch(0, 1);
-
-    return grid;
+    return [stageIdx, matchIdx];
   }
 }
