@@ -1,6 +1,9 @@
 // import {DoubleDownGrid} from './double-down.grid';
 //
-// describe('DoubleDown Grid', () => {
+describe('DoubleDown Grid', () => {
+  it('123', () => {
+    expect(1).toBeTruthy();
+  });
 //   beforeAll(() => {
 //   });
 //
@@ -43,4 +46,4 @@
 //     expect(grid._stages[0].matches.length).toBe(2);
 //     expect(grid._stages[2].matches.length).toBe(1);
 //   });
-// });
+});

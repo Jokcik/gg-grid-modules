@@ -4,17 +4,14 @@ import {Grid} from '../interfaces/grid.interface';
 
 export class SingleEliminationController {
   public generateGrid(players: Player[]): SingleEliminationGrid {
-    const grid: SingleEliminationGrid = new SingleEliminationGrid(players, {});
-
-    // grid.setScoreAndMovePlayers(grid.stages[0].matches[0], 1, 0);
-    // grid.setScoreAndMovePlayers(grid.stages[0].matches[1], 1, 0);
+    const grid: SingleEliminationGrid = new SingleEliminationGrid(players, { prizePlaces: 4 });
 
     console.log(grid.stages[0].matches);
     console.log('------------------------------------------------------------------------------------------------------------------');
     console.log(grid.stages[1].matches);
     console.log('------------------------------------------------------------------------------------------------------------------');
-    // console.log(grid.stages[2].matches);
-    // console.log('------------------------------------------------------------------------------------------------------------------');
+    console.log(grid.stages);
+    console.log('------------------------------------------------------------------------------------------------------------------');
 
     return grid;
   }

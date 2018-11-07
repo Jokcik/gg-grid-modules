@@ -4,7 +4,10 @@
 // import {DoubleDownGrid} from './double-down.grid';
 // import {SingleEliminationGrid} from '../../single-elimination/models/single-elimination.grid';
 //
-// describe('DoubleElimination Grid', () => {
+describe('DoubleElimination Grid', () => {
+  it('123', () => {
+    expect(1).toBeTruthy();
+  });
 //   let grid: DoubleEliminationGrid;
 //   beforeEach(() => {
 //     grid = new DoubleEliminationGrid();
@@ -114,4 +117,4 @@
 //     });
 //   });
 //
-// });
+});

@@ -1,5 +1,6 @@
 import {Stage} from '../models/stage';
 import {Match} from '../models/match';
+import {Player} from '../models/player';
 
 export abstract class Grid {
   protected _stages: Stage[];
@@ -39,6 +40,12 @@ export abstract class Grid {
    * @return object объект с json структурой
    */
   public abstract getJson(): object;
+
+  /**
+   * Получить победителей в сетке
+   * @return Player[] список игроков, которые победили в сетке
+   */
+  public abstract getWinners(): Player[];
 
   /**
    * Преобразует json структуру сетки
