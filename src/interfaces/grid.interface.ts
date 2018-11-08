@@ -55,11 +55,6 @@ export abstract class Grid {
    * @return Player[] список игроков, которые победили в сетке
    */
   public abstract setWinnersPrevGrid(winners: IPlayer[]): void;
-  /**
-   * Преобразует json структуру сетки
-   * @return object объект с json структурой
-   */
-  public abstract fromJson(grid: object): Grid;
 
   /**
    * Возвращает разницу текущей сетки и передаваемой

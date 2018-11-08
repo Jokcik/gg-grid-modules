@@ -53,3 +53,5 @@ manager.generateGrids(players8);
 manager.setScoreAndMovePlayers(manager._grids[0], manager._grids[0].stages[0].matches[0], 1, 0);
 
 console.log(manager._grids[1].stages[0].matches);
+
+console.log((<any>manager.toJsonGrids()[1])._stages[0].matches);

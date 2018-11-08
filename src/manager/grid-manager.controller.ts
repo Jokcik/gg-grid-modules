@@ -4,6 +4,7 @@ import {IPlayer} from '../interfaces';
 import {GridTypesEnum} from './grid-types.enum';
 import {SingleEliminationGrid} from '../grids/single-elimination/models/single-elimination.grid';
 import {Match} from '../models';
+import {plainToClass} from 'class-transformer';
 
 export class GridManager {
   public _grids: Grid[];
@@ -11,7 +12,14 @@ export class GridManager {
   constructor(private configs: IGridConfig[]) {
   }
 
-  public restoreGrids(grids: object[]) {
+  public restoreGridsFromJson(grids: object[]) {
+    for (let i = 0; i < grids.length; ++i) {
+      this._grids[i] = this.getGridFromJson(grids[i], this.configs[i].type);
+    }
+  }
+
+  public toJsonGrids() {
+    return this._grids.map(grid => grid.getJson());
   }
 
   public setScoreAndMovePlayers(grid: Grid, match: Match, ...scores) {
@@ -40,14 +48,22 @@ export class GridManager {
     return this._grids;
   }
 
-  private generateGrid(players: IPlayer[], config: IGridConfig): Grid {
-    switch (config.type) {
-      case GridTypesEnum.SINGLE_ELIMINATION:
-        return new SingleEliminationGrid(players, config);
-      default:
-        break;
+  private getGridFromJson(grid: object, type: GridTypesEnum) {
+    const typeGrid = this.getGridClass(type);
+    return plainToClass(typeGrid, grid);
+  }
+
+  private getGridClass(type: GridTypesEnum) {
+    switch (type) {
+      case GridTypesEnum.SINGLE_ELIMINATION: return SingleEliminationGrid;
+      default: break;
     }
 
     return null;
+  }
+
+  private generateGrid(players: IPlayer[], config: IGridConfig): Grid {
+    const gridClass = this.getGridClass(config.type);
+    return new gridClass(players, config);
   }
 }

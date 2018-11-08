@@ -1,13 +1,8 @@
-import {Grid} from '../../../interfaces';
-import {Stage} from '../../../models';
-import {EMPTY_PLAYER, Player} from '../../../models';
-import {IPlayer} from '../../../interfaces';
-import {IGridConfig} from '../../../interfaces';
-import {Match} from '../../../models';
+import {DeepDiff, Grid, IGridConfig, IPlayer} from '../../../interfaces';
+import {EMPTY_PLAYER, Match, Player, Stage} from '../../../models';
 import {shuffle} from 'lodash';
 import {diff} from 'deep-diff';
-import {classToPlain, Exclude, Expose, plainToClass} from 'class-transformer';
-import {DeepDiff} from '../../../interfaces';
+import {classToPlain, Exclude, Expose} from 'class-transformer';
 
 @Exclude()
 export class SingleEliminationGrid extends Grid {
@@ -19,6 +14,8 @@ export class SingleEliminationGrid extends Grid {
   constructor(private players: IPlayer[],
               private config: IGridConfig) {
     super();
+    if (!this.players) { return; }
+
     const countStages = Math.ceil(Math.log2(this.players.length)) || 1;
     if (players.length < 2) { throw new Error('Количество игроков должно быть больше 1'); }
 
@@ -47,10 +44,6 @@ export class SingleEliminationGrid extends Grid {
     }
 
     return null;
-  }
-
-  public fromJson(grid: object): Grid {
-    return plainToClass(SingleEliminationGrid, grid);
   }
 
   public getDiff<T extends Grid>(grid: T): DeepDiff {
@@ -185,7 +178,6 @@ export class SingleEliminationGrid extends Grid {
     for (let i = 0; i < winners.length; ++i) {
       const winner = winners[i];
       const matchIdx = Math.floor(i / 2);
-      console.log(i, winner, matchIdx);
 
       if (i % 2 === 0) {
         this.stages[0].matches[matchIdx].players[0] = winner;

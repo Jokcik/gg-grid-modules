@@ -1,4 +1,4 @@
-import {BestOf, IMatch} from '../interfaces/match.interface';
+import {BestOf, IMatch} from '../interfaces';
 import {Exclude, Expose, plainToClass, Transform} from 'class-transformer';
 import {Player} from './player';
 
@@ -13,7 +13,7 @@ export class Match implements IMatch {
   scores: number[] = [];
 
   @Expose()
-  @Transform((values: Player[]) => values.map(value => value.id), { toPlainOnly: true })
+  @Transform((values: Player[]) => values.map(value => value ? value.id : null), { toPlainOnly: true })
   @Transform((values: Player[]) => values.map(value => plainToClass(Player, value)), { toClassOnly: true })
   players: Player[] = [];
 
