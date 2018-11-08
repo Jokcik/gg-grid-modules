@@ -26,4 +26,4 @@ export class DiffArray {
   item: DiffNew;
 }
 
-export type DeepDiff = DiffEdit | DiffArray | DiffDeleted | DiffNew;
+export type DeepDiff = (DiffEdit | DiffArray | DiffDeleted | DiffNew)[];
