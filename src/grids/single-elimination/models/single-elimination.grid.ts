@@ -1,23 +1,20 @@
-import {Grid} from '../../interfaces/grid.interface';
-import {Stage} from '../../models/stage';
-import {EMPTY_PLAYER, Player} from '../../models/player';
-import {IPlayer} from '../../interfaces/player.interface';
-import {IGridConfig} from '../../interfaces/grid-config.interface';
-import {Match} from '../../models/match';
+import {Grid} from '../../../interfaces';
+import {Stage} from '../../../models';
+import {EMPTY_PLAYER, Player} from '../../../models';
+import {IPlayer} from '../../../interfaces';
+import {IGridConfig} from '../../../interfaces';
+import {Match} from '../../../models';
 import {shuffle} from 'lodash';
-import { diff } from 'deep-diff';
-import {classToPlain, Exclude, Expose, plainToClass, serialize} from 'class-transformer';
-import {DeepDiff} from '../../interfaces/deep-diff';
+import {diff} from 'deep-diff';
+import {classToPlain, Exclude, Expose, plainToClass} from 'class-transformer';
+import {DeepDiff} from '../../../interfaces';
 
 @Exclude()
 export class SingleEliminationGrid extends Grid {
-  @Expose()
-  protected _stages: Stage[];
+  public _id: string = Math.random().toString(36).substr(2, 14);
 
   @Expose()
-  get type() {
-    return 'SingleEliminationGrid';
-  }
+  protected _stages: Stage[];
 
   constructor(private players: IPlayer[],
               private config: IGridConfig) {
@@ -151,7 +148,7 @@ export class SingleEliminationGrid extends Grid {
     return this._stages;
   }
 
-  private initFirstStage(players: IPlayer[]): Stage[] {
+  private initFirstStage(players: IPlayer[]): void {
     const stage = this._stages[0];
     const matchLength = stage.matches.length;
     let playersCopy = players.slice();
@@ -164,8 +161,6 @@ export class SingleEliminationGrid extends Grid {
     playersCopy.push(...Array(needPlayers).fill(EMPTY_PLAYER));
     playersCopy = shuffle(playersCopy);
     stage.matches.forEach(match => match.players[1] = playersCopy.pop());
-
-    return this._stages;
   }
 
   private winEmptyPlayers(stageId: number): Stage[] {
@@ -184,6 +179,20 @@ export class SingleEliminationGrid extends Grid {
     });
 
     return this._stages;
+  }
+
+  public setWinnersPrevGrid(winners: IPlayer[]): void {
+    for (let i = 0; i < winners.length; ++i) {
+      const winner = winners[i];
+      const matchIdx = Math.floor(i / 2);
+      console.log(i, winner, matchIdx);
+
+      if (i % 2 === 0) {
+        this.stages[0].matches[matchIdx].players[0] = winner;
+      } else {
+        this.stages[0].matches[matchIdx].players[1] = winner;
+      }
+    }
   }
 
   public getWinners(): Player[] {

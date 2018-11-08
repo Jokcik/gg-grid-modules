@@ -3,10 +3,10 @@ import 'es6-shim';
 
 import {SingleEliminationGrid} from './single-elimination.grid';
 import * as _ from 'lodash';
-import {EMPTY_PLAYER, Player} from '../../models/player';
-import {IGridConfig} from '../../interfaces/grid-config.interface';
-import {Stage} from '../../models/stage';
-import {Match} from '../../models/match';
+import {EMPTY_PLAYER, Player} from '../../../models/player';
+import {IGridConfig} from '../../../interfaces/grid-config.interface';
+import {Stage} from '../../../models/stage';
+import {Match} from '../../../models/match';
 import {classToPlain, deserialize, serialize} from 'class-transformer';
 
 describe('SingleElimination Grid', () => {
@@ -374,16 +374,8 @@ describe('SingleElimination Grid', () => {
 
       const winners = grid.getWinners();
 
-      console.log(serialize(grid));
-
       expect(winners.length).toBe(1);
       expect(winners[0].id).toBe(players8[2].id);
-      const match = `{"_id":"y28y9ss89m","bo":1,"scores":[1,0],"players":[{"_id":"8","username":"123"},{"_id":"4","username":"test"}]}`;
-
-      const value = deserialize(Match, match);
-      console.log(value);
-      console.log(value.players[0]);
-      value.players[0].getValue();
     });
 
     it('winner 2', () => {

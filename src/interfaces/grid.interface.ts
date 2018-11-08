@@ -1,9 +1,11 @@
-import {Stage} from '../models/stage';
-import {Match} from '../models/match';
-import {Player} from '../models/player';
+import {Stage} from '../models';
+import {Match} from '../models';
+import {Player} from '../models';
 import {DeepDiff} from './deep-diff';
+import {IPlayer} from './player.interface';
 
 export abstract class Grid {
+  public _id: string;
   protected _stages: Stage[];
   get stages() {
     return this._stages;
@@ -48,6 +50,11 @@ export abstract class Grid {
    */
   public abstract getWinners(): Player[];
 
+  /**
+   * Устанавливает игроков в первой стадии
+   * @return Player[] список игроков, которые победили в сетке
+   */
+  public abstract setWinnersPrevGrid(winners: IPlayer[]): void;
   /**
    * Преобразует json структуру сетки
    * @return object объект с json структурой
