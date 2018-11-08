@@ -10,4 +10,4 @@ export class Player implements IPlayer {
   }
 }
 
-export const EMPTY_PLAYER: IPlayer = new Player();
+export const EMPTY_PLAYER: IPlayer = new Player('empty');

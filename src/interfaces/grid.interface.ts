@@ -1,6 +1,7 @@
 import {Stage} from '../models/stage';
 import {Match} from '../models/match';
 import {Player} from '../models/player';
+import {DeepDiff} from './deep-diff';
 
 export abstract class Grid {
   protected _stages: Stage[];
@@ -51,12 +52,12 @@ export abstract class Grid {
    * Преобразует json структуру сетки
    * @return object объект с json структурой
    */
-  public abstract fromJson<T extends Grid>(grid: object): T;
+  public abstract fromJson(grid: object): Grid;
 
   /**
    * Возвращает разницу текущей сетки и передаваемой
    * @param grid сетка, с которой необходимо найти разницу
    * @return object разница в видео json структуры
    */
-  public abstract getDiff<T extends Grid>(grid: T): object;
+  public abstract getDiff<T extends Grid>(grid: T): DeepDiff;
 }

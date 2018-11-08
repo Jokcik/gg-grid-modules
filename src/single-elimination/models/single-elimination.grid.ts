@@ -5,15 +5,19 @@ import {IPlayer} from '../../interfaces/player.interface';
 import {IGridConfig} from '../../interfaces/grid-config.interface';
 import {Match} from '../../models/match';
 import {shuffle} from 'lodash';
+import { diff } from 'deep-diff';
+import {classToPlain, Exclude, Expose, plainToClass, serialize} from 'class-transformer';
+import {DeepDiff} from '../../interfaces/deep-diff';
 
+@Exclude()
 export class SingleEliminationGrid extends Grid {
-  // public addSuperFinal() {
-  //   const stage = new Stage();
-  //   stage.matches.push(new Match());
-  //   this._stages.push(stage);
-  //
-  //   return this;
-  // }
+  @Expose()
+  protected _stages: Stage[];
+
+  @Expose()
+  get type() {
+    return 'SingleEliminationGrid';
+  }
 
   constructor(private players: IPlayer[],
               private config: IGridConfig) {
@@ -48,16 +52,19 @@ export class SingleEliminationGrid extends Grid {
     return null;
   }
 
-  public fromJson<T extends Grid>(grid: object): T {
-    return undefined;
+  public fromJson(grid: object): Grid {
+    return plainToClass(SingleEliminationGrid, grid);
   }
 
-  public getDiff<T extends Grid>(grid: T): object {
-    return undefined;
+  public getDiff<T extends Grid>(grid: T): DeepDiff {
+    const currentJson = this.getJson();
+    const gridJson = grid.getJson();
+
+    return diff(currentJson, gridJson);
   }
 
   public getJson(): object {
-    return undefined;
+    return classToPlain(this);
   }
 
   public getMatch(matchId: string): Match {

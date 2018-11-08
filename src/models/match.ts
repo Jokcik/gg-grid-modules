@@ -1,12 +1,21 @@
 import {BestOf, IMatch} from '../interfaces/match.interface';
-import {IPlayer} from '../interfaces/player.interface';
+import {Exclude, Expose, plainToClass, Transform} from 'class-transformer';
+import {Player} from './player';
 
+@Exclude()
 export class Match implements IMatch {
+  @Expose()
   _id: string = Math.random().toString(36).substr(2, 14);
 
+  @Expose()
   bo: BestOf = BestOf.BO1;
-  players: IPlayer[] = [];
+  @Expose()
   scores: number[] = [];
+
+  @Expose()
+  @Transform((values: Player[]) => values.map(value => value.id), { toPlainOnly: true })
+  @Transform((values: Player[]) => values.map(value => plainToClass(Player, value)), { toClassOnly: true })
+  players: Player[] = [];
 
   get closed() {
     return this.scores.some(score => score >= this.bo);

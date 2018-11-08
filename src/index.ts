@@ -1,28 +1,35 @@
-import {SingleEliminationController} from './single-elimination/single-elimination.controller';
-import {EMPTY_PLAYER, Player} from './models/player';
-// import {DoubleEliminationController} from './double-elimination/double-elimination.controller';
-// import {EMPTY_PLAYER} from './single-elimination/models/match';
+import 'reflect-metadata';
+import 'es6-shim';
+import { diff } from 'deep-diff';
 
-const single = new SingleEliminationController();
-// const double = new DoubleEliminationController();
+const data = {
+  issue: 126,
+  submittedBy: 'abuzarhamza',
+  title: 'readme.md need some additional example prefilter',
+  posts: [
+    {
+      date: '2018-04-16',
+      value: {
+        title2: '123',
+      },
+      text: `additional example for prefilter for deep-diff would be great.
+      https://stackoverflow.com/questions/38364639/pre-filter-condition-deep-diff-node-js`,
+    },
+  ],
+};
 
-const players = Array(8);
-players[0] = new Player('0');
-players[1] = new Player('1');
-players[2] = new Player('2');
-players[3] = new Player('3');
-players[4] = new Player('4');
-players[5] = EMPTY_PLAYER;
-players[6] = EMPTY_PLAYER;
-players[7] = new Player('7');
+const clone = JSON.parse(JSON.stringify(data));
+clone.issue = 1;
+clone.title = 'README.MD needs additional example illustrating how to prefilter';
+clone.disposition = 'completed';
+clone.posts[0].value.title2 = 'title';
+clone.posts[1] = {date: '123', text: 'title555'};
 
-single.generateGrid(players);
+delete clone.posts[0].date;
 
+const two = diff(data, clone);
+const none = diff(data, clone,
+  (path, key) => path.length === 0 && ~['title', 'disposition'].indexOf(key)
+);
 
-
-
-
-
-
-
-
+console.log(two);

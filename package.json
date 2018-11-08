@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.116",
+    "class-transformer": "^0.2.0",
+    "deep-diff": "^1.0.2",
+    "es6-shim": "^0.35.4",
     "lodash": "^4.17.11",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.2.2",
