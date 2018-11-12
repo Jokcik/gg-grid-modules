@@ -1,5 +1,4 @@
-import {IStage} from '../interfaces/stage.interface';
-import {IMatch} from '../interfaces/match.interface';
+import {IMatch, IStage} from '../interfaces';
 import {Exclude, Expose} from 'class-transformer';
 
 @Exclude()

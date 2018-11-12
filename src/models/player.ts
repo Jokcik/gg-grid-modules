@@ -1,4 +1,4 @@
-import {IPlayer} from '../interfaces/player.interface';
+import {IPlayer} from '../interfaces';
 
 export class Player implements IPlayer {
   id: string;

@@ -6,10 +6,6 @@ import {IPlayer} from './player.interface';
 
 export abstract class Grid {
   public _id: string;
-  protected _stages: Stage[];
-  get stages() {
-    return this._stages;
-  }
 
   /**
    * Устанавливает результат в матче и продвигает игрока дальше по сетке

@@ -10,6 +10,9 @@ export class SingleEliminationGrid extends Grid {
 
   @Expose()
   protected _stages: Stage[];
+  get stages() {
+    return this._stages;
+  }
 
   constructor(private players: IPlayer[],
               private config: IGridConfig) {

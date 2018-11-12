@@ -3,10 +3,8 @@ import 'es6-shim';
 
 import {SingleEliminationGrid} from './single-elimination.grid';
 import * as _ from 'lodash';
-import {EMPTY_PLAYER, Player} from '../../../models/player';
-import {IGridConfig} from '../../../interfaces/grid-config.interface';
-import {Stage} from '../../../models/stage';
-import {Match} from '../../../models/match';
+import {EMPTY_PLAYER, Match, Player, Stage} from '../../../models';
+import {IGridConfig} from '../../../interfaces';
 import {classToPlain, deserialize, serialize} from 'class-transformer';
 
 describe('SingleElimination Grid', () => {
