@@ -426,7 +426,7 @@ describe('SingleElimination Grid', () => {
       expect(winners[3].id).toBe(players8[7].id);
     });
 
-    it('winner 4 playersNextGrid', () => {
+    it('winner 4 outputPlayersCount', () => {
       const grid = new SingleEliminationGrid(players8, { playersNextGrid: 4 });
       setGrid(grid);
 

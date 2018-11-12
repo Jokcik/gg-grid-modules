@@ -3,10 +3,18 @@ import {EMPTY_PLAYER, Match, Player, Stage} from '../../../models';
 import {shuffle} from 'lodash';
 import {diff} from 'deep-diff';
 import {classToPlain, Exclude, Expose} from 'class-transformer';
+import {GridTypesEnum} from '../../../manager';
+
 
 @Exclude()
 export class SingleEliminationGrid extends Grid {
   public _id: string = Math.random().toString(36).substr(2, 14);
+  private static _type: GridTypesEnum = GridTypesEnum.SINGLE_ELIMINATION;
+
+  public static isType(type: GridTypesEnum) {
+    return this._type === type;
+  }
+
 
   @Expose()
   protected _stages: Stage[];
@@ -27,8 +35,8 @@ export class SingleEliminationGrid extends Grid {
       this.addThird();
     }
 
-    if (config.playersNextGrid) {
-      const winnerCountStages = config.playersNextGrid / 2;
+    if (config.outputPlayersCount) {
+      const winnerCountStages = config.outputPlayersCount / 2;
       const stageIndex = this.stages.findIndex(stage => stage.matches.length === winnerCountStages);
       this._stages = this.stages.slice(0, stageIndex);
     }
@@ -177,7 +185,7 @@ export class SingleEliminationGrid extends Grid {
     return this._stages;
   }
 
-  public setWinnersPrevGrid(winners: IPlayer[]): void {
+  public setPlayers(winners: IPlayer[]): void {
     for (let i = 0; i < winners.length; ++i) {
       const winner = winners[i];
       const matchIdx = Math.floor(i / 2);
@@ -193,7 +201,7 @@ export class SingleEliminationGrid extends Grid {
   public getWinners(): Player[] {
     const winners = [];
 
-    if (this.config.playersNextGrid) {
+    if (this.config.outputPlayersCount) {
       return this.stages[this.stages.length - 1].matches.map(match => match.winner);
     }
 

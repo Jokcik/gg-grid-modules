@@ -82,7 +82,7 @@ export class DoubleEliminationGrid extends Grid {
     }
   }
 
-  setWinnersPrevGrid(winners: IPlayer[]): void {
+  setPlayers(winners: IPlayer[]): void {
   }
 
   private addSuperFinal() {

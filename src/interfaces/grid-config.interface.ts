@@ -3,6 +3,6 @@ import {GridTypesEnum} from '../manager';
 export interface IGridConfig {
   type?: GridTypesEnum;
   prizePlaces?: number;
-  playersNextGrid?: number;
+  outputPlayersCount?: number;
   [key: string]: any;
 }

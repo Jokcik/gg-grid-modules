@@ -3,9 +3,14 @@ import {Match} from '../models';
 import {Player} from '../models';
 import {DeepDiff} from './deep-diff';
 import {IPlayer} from './player.interface';
+import {GridTypesEnum} from '../manager';
 
 export abstract class Grid {
   public _id: string;
+
+  public static isType(type: GridTypesEnum): boolean {
+    throw new Error('абстрактный класс');
+  }
 
   /**
    * Устанавливает результат в матче и продвигает игрока дальше по сетке
@@ -50,7 +55,7 @@ export abstract class Grid {
    * Устанавливает игроков в первой стадии
    * @return Player[] список игроков, которые победили в сетке
    */
-  public abstract setWinnersPrevGrid(winners: IPlayer[]): void;
+  public abstract setPlayers(winners: IPlayer[]): void;
 
   /**
    * Возвращает разницу текущей сетки и передаваемой

@@ -37,7 +37,7 @@ import {GridTypesEnum} from './manager';
 //
 // console.log(two);
 
-const manager = new GridManager([{ playersNextGrid: 4, type: GridTypesEnum.SINGLE_ELIMINATION }, { prizePlaces: 1, type: GridTypesEnum.SINGLE_ELIMINATION }]);
+const manager = new GridManager([{ outputPlayersCount: 4, type: GridTypesEnum.SINGLE_ELIMINATION }, { prizePlaces: 1, type: GridTypesEnum.SINGLE_ELIMINATION }]);
 
 const players8 = Array(8).fill(EMPTY_PLAYER);
 players8[0] = new Player('1');

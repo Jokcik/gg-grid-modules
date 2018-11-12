@@ -7,6 +7,7 @@ import {Match} from '../models';
 import {plainToClass} from 'class-transformer';
 
 export class GridManager {
+  private static _gridTypes: (typeof Grid)[] = [];
   public _grids: Grid[];
 
   constructor(private configs: IGridConfig[]) {
@@ -31,7 +32,7 @@ export class GridManager {
     const winners = grid.getWinners();
     const nextGrid = this._grids[gridIndex + 1];
 
-    nextGrid.setWinnersPrevGrid(winners);
+    nextGrid.setPlayers(winners);
   }
 
   public generateGrids(players: IPlayer[]) {
@@ -42,28 +43,33 @@ export class GridManager {
       const config = this.configs[i];
       this._grids[i] = this.generateGrid(nextPlayers, config);
 
-      nextPlayers = Array(config.playersNextGrid);
+      nextPlayers = Array(config.outputPlayersCount);
     }
 
     return this._grids;
   }
 
-  private getGridFromJson(grid: object, type: GridTypesEnum) {
+  private getGridFromJson(grid: object, type: GridTypesEnum): any {
     const typeGrid = this.getGridClass(type);
     return plainToClass(typeGrid, grid);
   }
 
-  private getGridClass(type: GridTypesEnum) {
-    switch (type) {
-      case GridTypesEnum.SINGLE_ELIMINATION: return SingleEliminationGrid;
-      default: break;
+  private getGridClass(type: GridTypesEnum): any {
+    for (const classType of GridManager._gridTypes) {
+      if (classType.isType(type)) {
+        return classType;
+      }
     }
 
-    return null;
+    throw new Error(`Нет зарегистрирован тип: ${type}`);
   }
 
   private generateGrid(players: IPlayer[], config: IGridConfig): Grid {
     const gridClass = this.getGridClass(config.type);
     return new gridClass(players, config);
+  }
+
+  static register(type: any) {
+    this._gridTypes.push(type);
   }
 }
