@@ -7,7 +7,9 @@ export class DoubleDownGrid {
     return this._stages;
   }
 
-  constructor(players: IPlayer[]) {
+  constructor(players?: IPlayer[]) {
+    if (!players) { return; }
+
     const countStages = Math.ceil(Math.log2(players.length));
     this.generateStages(countStages);
   }

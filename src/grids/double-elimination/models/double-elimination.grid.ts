@@ -28,6 +28,32 @@ export class DoubleEliminationGrid extends Grid {
   }
 
   cancelMatchResultAndRevertMovePlayers(match: Match) {
+    // const players = match.players.slice();
+    // this.upGrid.cancelMatchResultAndRevertMovePlayers(match);
+    //
+    //
+    //
+    // const [stageIdx, matchIdx] = this.getStageAndMatchIdx(match);
+    // match.clear();
+    //
+    // let currentMatchId = matchIdx;
+    // const players: Player[] = [];
+    // for (let i = stageIdx; i < this._stages.length; ++i) {
+    //   const currentMatch = this._stages[i].matches[currentMatchId];
+    //
+    //   if (i !== stageIdx) {
+    //     if (currentMatch.players[0] && players.find(player => player.id === currentMatch.players[0].id)) {
+    //       currentMatch.clear();
+    //       delete currentMatch.players[0];
+    //     } else if (currentMatch.players[1] && players.find(player => player.id === currentMatch.players[1].id)) {
+    //       currentMatch.clear();
+    //       delete currentMatch.players[1];
+    //     }
+    //   }
+    //
+    //   players.push(currentMatch.players[0] || new Player(), currentMatch.players[1] || new Player());
+    //   currentMatchId = this.getNextMatchIdx(matchIdx);
+    // }
   }
 
   findMatchByPlayer(playerId: string): Match {
@@ -69,7 +95,25 @@ export class DoubleEliminationGrid extends Grid {
   }
 
   getWinners(): Player[] {
-    return [];
+    const winners = [];
+
+    const upStages = this.upGrid.stages;
+    const downStages = this.downGrid.stages;
+    winners.push(upStages[upStages.length - 1].matches[0].winner);
+
+    if (this.config.prizePlaces >= 2) {
+      winners.push(upStages[upStages.length - 1].matches[0].loser);
+    }
+
+    if (this.config.prizePlaces >= 3) {
+      winners.push(downStages[downStages.length - 1].matches[0].winner);
+    }
+
+    if (this.config.prizePlaces === 4) {
+      winners.push(downStages[downStages.length - 1].matches[0].loser);
+    }
+
+    return winners;
   }
 
   setScoreAndMovePlayers(match: Match, ...scorePlayers: number[]): void {
@@ -83,6 +127,16 @@ export class DoubleEliminationGrid extends Grid {
   }
 
   setPlayers(winners: IPlayer[]): void {
+    for (let i = 0; i < winners.length; ++i) {
+      const winner = winners[i];
+      const matchIdx = Math.floor(i / 2);
+
+      if (i % 2 === 0) {
+        this.upGrid.stages[0].matches[matchIdx].players[0] = winner;
+      } else {
+        this.upGrid.stages[0].matches[matchIdx].players[1] = winner;
+      }
+    }
   }
 
   private addSuperFinal() {
@@ -158,10 +212,10 @@ export class DoubleEliminationGrid extends Grid {
     }
   }
 
-  public winDownGridPlayer(match: Match, ...scorePlayers: number[]): void {
+  private winDownGridPlayer(match: Match, ...scorePlayers: number[]): void {
     match.setScore(scorePlayers[0], scorePlayers[1]);
     if (!match.closed) { return; }
-    const [stageIdx, matchIdx] = this.getStageAndMatchIdx(match, this.upGrid.stages);
+    const [stageIdx, matchIdx] = this.getStageAndMatchIdx(match, this.downGrid.stages);
 
     const nextStage = this.downGrid.stages[stageIdx + 1];
     if (!nextStage) {

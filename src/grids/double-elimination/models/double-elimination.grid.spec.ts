@@ -14,6 +14,7 @@ import {EMPTY_PLAYER, Player} from '../../../models';
 describe('DoubleElimination Grid', () => {
   let config: IGridConfig;
   // let grid: DoubleEliminationGrid;
+  let bo;
 
   let players2: Player[];
   let players4: Player[];
@@ -23,6 +24,7 @@ describe('DoubleElimination Grid', () => {
   beforeEach(() => {
     config = { prizePlaces: 3 };
     (_ as any).shuffle = collections => collections;
+    bo = 1;
 
     players2 = Array(2).fill(EMPTY_PLAYER);
     players2[0] = new Player('1');
@@ -41,6 +43,7 @@ describe('DoubleElimination Grid', () => {
     players8[4] = new Player('5');
     players8[5] = new Player('6');
     players8[6] = new Player('7');
+    players8[7] = new Player('8');
 
     players16 = Array(16).fill(EMPTY_PLAYER);
     players16[0] = new Player('1');
@@ -56,87 +59,78 @@ describe('DoubleElimination Grid', () => {
 
   describe('should be winDownGridPlayer', () => {
     it('odd stageId', () => {
-      // const grid = new DoubleEliminationGrid(players8, config);
-      // grid.winDownGridPlayer(grid.sta, 0, '2', 1);
-      // expect(grid.downGrid._stages[1].matches[0].player2).toBe('2');
-      expect(true).toBeTruthy();
+      const grid = new DoubleEliminationGrid(players8, config);
+      grid.setScoreAndMovePlayers(grid.upGrid.stages[0].matches[0], 0, bo);
+      expect(grid.upGrid.stages[1].matches[0].players[0].id).toBe(players8[3].id);
     });
 
-    // it('even stageId', () => {
-    //   grid.downGrid._stages[1].matches[0].player2 = '2';
-    //   grid.downGrid._stages[1].matches[1].player2 = '3';
-    //   grid.winDownGridPlayer(1, 0, '2', 1);
-    //   grid.winDownGridPlayer(1, 1, '3', 1);
-    //
-    //   expect(grid.downGrid._stages[2].matches[0].player1).toBe('2');
-    //   expect(grid.downGrid._stages[2].matches[0].player2).toBe('3');
-    // });
-    //
-    // it('superfinal', () => {
-    //   grid.downGrid._stages[3].matches[0].player2 = '1';
-    //   grid.winDownGridPlayer(3, 0, '1', 1);
-    //
-    //   expect(grid.upGrid._stages[3].matches[0].player2).toBe('1');
-    // });
+    it('even stageId', () => {
+      const grid = new DoubleEliminationGrid(players8, config);
+      grid.downGrid.stages[1].matches[0].players[1] = players8[1];
+      grid.downGrid.stages[1].matches[1].players[1] = players8[2];
+      grid.setScoreAndMovePlayers(grid.downGrid.stages[1].matches[0], 0, bo);
+      grid.setScoreAndMovePlayers(grid.downGrid.stages[1].matches[1], 0, bo);
+
+      players8 = players8.slice();
+      expect(grid.downGrid.stages[2].matches[0].players[0].id).toBe(players8[1].id);
+      expect(grid.downGrid.stages[2].matches[0].players[1].id).toBe(players8[2].id);
+    });
+
+    it('superfinal', () => {
+      const grid = new DoubleEliminationGrid(players8, config);
+      grid.downGrid.stages[3].matches[0].players[1] = players8[0];
+      grid.setScoreAndMovePlayers(grid.downGrid.stages[3].matches[0], 0, bo);
+
+      players8 = players8.slice();
+      expect(grid.upGrid.stages[3].matches[0].players[1].id).toBe(players8[0].id);
+    });
   });
 
-//   describe('should be checkDownEmptyMatch', () => {
-//     it('empty start stage', () => {
-//       grid.downGrid._stages[0].matches[0].player2 = EMPTY_PLAYER;
-//       grid.downGrid._stages[0].matches[1].player1 = EMPTY_PLAYER;
-//       grid.checkDownEmptyMatch(0, 0);
-//       grid.checkDownEmptyMatch(0, 1);
-//
-//       expect(grid.downGrid._stages[1].matches[0].player2).toBe(grid.downGrid._stages[0].matches[0].player1);
-//       expect(grid.downGrid._stages[1].matches[1].player2).toBe(grid.downGrid._stages[0].matches[1].player2);
-//     });
-//   });
-//
-//   describe('should be winUpGridPlayer', () => {
-//     beforeEach(() => {
-//       grid = new DoubleEliminationGrid();
-//       grid.upGrid = new SingleEliminationGrid();
-//       grid.downGrid = new DoubleDownGrid();
-//       grid.downGrid._stages = [new Stage(), new Stage(), new Stage(), new Stage()];
-//       grid.downGrid._stages[0].matches = [new Match(), new Match()];
-//
-//       grid.upGrid._stages = [new Stage(), new Stage(), new Stage()];
-//       grid.upGrid._stages[0].matches = [new Match(), new Match(), new Match(), new Match()];
-//       grid.upGrid._stages[1].matches = [new Match(), new Match()];
-//       grid.upGrid._stages[2].matches = [new Match()];
-//       grid.upGrid._stages[0].matches[0].player1 = '1';
-//       grid.upGrid._stages[0].matches[0].player2 = '2';
-//       grid.upGrid._stages[0].matches[1].player1 = '3';
-//       grid.upGrid._stages[0].matches[1].player2 = '4';
-//       grid.upGrid._stages[0].matches[2].player1 = '5';
-//       grid.upGrid._stages[0].matches[2].player2 = '6';
-//       grid.upGrid._stages[0].matches[3].player1 = '7';
-//       grid.upGrid._stages[0].matches[3].player2 = '8';
-//
-//     });
-//
-//     it('even match stageId 0', () => {
-//       grid.winUpGridPlayer(0, 0, '1', 1);
-//
-//       expect(grid.upGrid._stages[1].matches[0].player1).toBe('1');
-//       expect(grid.downGrid._stages[0].matches[0].player1).toBe('2');
-//     });
-//
-//     it('odd match stageId 0', () => {
-//       grid.winUpGridPlayer(0, 1, '3', 1);
-//
-//       expect(grid.upGrid._stages[1].matches[0].player2).toBe('3');
-//       expect(grid.downGrid._stages[0].matches[0].player2).toBe('4');
-//     });
-//
-//     it('even match stageId 1', () => {
-//       grid.upGrid._stages[1].matches[0].player1 = '1';
-//       grid.upGrid._stages[1].matches[0].player2 = '3';
-//       grid.winUpGridPlayer(1, 0, '3', 1);
-//
-//       expect(grid.upGrid._stages[2].matches[0].player1).toBe('3');
-//       expect(grid.downGrid._stages[3].matches[0].player1).toBe('4');
-//     });
-//   });
-//
+  describe('should be checkDownEmptyMatch', () => {
+    it('empty start stage', () => {
+      const grid = new DoubleEliminationGrid(players8, config);
+      grid.downGrid.stages[0].matches[0].players[1] = EMPTY_PLAYER;
+      grid.downGrid.stages[0].matches[1].players[1] = EMPTY_PLAYER;
+
+      (grid as any).checkDownEmptyMatch(grid.downGrid.stages[0].matches[0]);
+      (grid as any).checkDownEmptyMatch(grid.downGrid.stages[0].matches[1]);
+
+      expect(grid.downGrid.stages[1].matches[0].players[0]).toBe(grid.downGrid.stages[0].matches[0].players[0]);
+      expect(grid.downGrid.stages[1].matches[0].players[1]).toBe(grid.downGrid.stages[0].matches[1].players[0]);
+    });
+  });
+
+  describe('should be winUpGridPlayer', () => {
+    it('even match stageId 0', () => {
+      const grid = new DoubleEliminationGrid(players8, config);
+      grid.setScoreAndMovePlayers(grid.upGrid.stages[0].matches[0], bo, 0);
+
+      expect(grid.upGrid.stages[1].matches[0].players[0].id).toBe(players8[7].id);
+      expect(grid.downGrid.stages[0].matches[0].players[0].id).toBe(players8[3].id);
+    });
+
+    it('odd match stageId 0', () => {
+      const grid = new DoubleEliminationGrid(players8, config);
+      grid.setScoreAndMovePlayers(grid.upGrid.stages[0].matches[0], bo, 0);
+      grid.setScoreAndMovePlayers(grid.upGrid.stages[0].matches[1], 0, bo);
+      grid.setScoreAndMovePlayers(grid.upGrid.stages[1].matches[0], 0, bo);
+
+      expect(grid.upGrid.stages[2].matches[0].players[0]).toBe(grid.upGrid.stages[0].matches[1].players[1]);
+      expect(grid.downGrid.stages[1].matches[1].players[0]).toBe(grid.upGrid.stages[0].matches[0].players[0]);
+    });
+  });
+
+  describe('should be checkDownEmptyMatch', () => {
+    it('empty start stage', () => {
+      const grid = new DoubleEliminationGrid(players8, config);
+      grid.downGrid.stages[0].matches[0].players[1] = EMPTY_PLAYER;
+      grid.downGrid.stages[0].matches[1].players[1] = EMPTY_PLAYER;
+
+      (grid as any).checkDownEmptyMatch(grid.downGrid.stages[0].matches[0]);
+      (grid as any).checkDownEmptyMatch(grid.downGrid.stages[0].matches[1]);
+
+      expect(grid.downGrid.stages[1].matches[0].players[0]).toBe(grid.downGrid.stages[0].matches[0].players[0]);
+      expect(grid.downGrid.stages[1].matches[0].players[1]).toBe(grid.downGrid.stages[0].matches[1].players[0]);
+    });
+  });
 });

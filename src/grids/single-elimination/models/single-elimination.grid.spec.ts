@@ -5,7 +5,6 @@ import {SingleEliminationGrid} from './single-elimination.grid';
 import * as _ from 'lodash';
 import {EMPTY_PLAYER, Match, Player, Stage} from '../../../models';
 import {IGridConfig} from '../../../interfaces';
-import {classToPlain, deserialize, serialize} from 'class-transformer';
 
 describe('SingleElimination Grid', () => {
   let config: IGridConfig;
@@ -427,7 +426,7 @@ describe('SingleElimination Grid', () => {
     });
 
     it('winner 4 outputPlayersCount', () => {
-      const grid = new SingleEliminationGrid(players8, { playersNextGrid: 4 });
+      const grid = new SingleEliminationGrid(players8, { outputPlayersCount: 4 });
       setGrid(grid);
 
       const winners = grid.getWinners();
